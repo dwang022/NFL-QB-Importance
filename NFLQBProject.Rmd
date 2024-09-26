@@ -1,0 +1,273 @@
+---
+title: "NFL QB Project"
+author: "Daniel Wang"
+date: "2023-02-12"
+output: pdf_document
+header-includes:
+  \usepackage{fvextra}
+  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(readxl)
+library(readr)
+nfl_data <- read_excel("nflqbanalysis.xlsx")
+```
+
+```{r}
+nfl_data %>%
+  select(Year, `OFF PASS`, `OFF RUSH`) %>%
+  pivot_longer(cols = c(`OFF PASS`, `OFF RUSH`), names_to = "Play", values_to = "Ranking") %>%
+  ggplot(aes(x = Year, y = `Ranking`, color = Play)) + geom_point() + geom_smooth() + ylim(32, 1) + guides(color = guide_legend(title = "Play")) + scale_fill_discrete(name = "Play", labels = c("Pass", "Rush")) + labs(y = "Ranking", title = "Offensive Rankings for Super Bowl Champions")
+
+ggsave("offpass_offrush2.jpeg")
+```
+
+```{r}
+library(RColorBrewer)
+brewer.pal(3, "Set2")
+```
+
+
+```{r}
+nfl_data %>%
+  select(Year, `OFF PASS`, `OFF RUSH`) %>%
+  pivot_longer(cols = c(`OFF PASS`, `OFF RUSH`), names_to = "Play", values_to = "Ranking") %>%
+  ggplot(aes(x = Year, y = `Ranking`, color = Play)) +
+  geom_point(size = 3, alpha = 0.7) +  # Add transparency and adjust point size
+  geom_smooth(method = "loess", se = FALSE, linetype = "solid") +  # Adjust smoothed line appearance
+  scale_color_brewer(palette = "Set2",  labels = c("Pass", "Rush")) +  # Use a different color palette
+  ylim(32, 1) +  # Set appropriate y-axis limits
+  guides(color = guide_legend(title = "Play")) +
+  labs(
+    y = "Ranking",
+    title = "Offensive Rankings for Super Bowl Champions",
+    x = "Year"
+  ) +
+  theme(
+    axis.text = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5)
+  ) 
+
+ggsave("NEW_offensiverankings.png")
+```
+
+
+```{r}
+nfl_data %>%
+  select(Year, OFF, DEF) %>%
+  pivot_longer(cols = c(OFF, DEF), names_to = "Play", values_to = "Ranking") %>%
+  ggplot(aes(x = Year, y = Ranking, color = Play)) + geom_point() + geom_smooth() + theme(legend.title= element_blank()) + ylim(32, 1) + labs(y = "Ranking", title = "Super Bowl Champion Offense vs Defense")
+
+ggsave("offense_defense.jpeg")
+```
+
+```{r}
+nfl_data %>%
+  select(Year, OFF, DEF) %>%
+  pivot_longer(cols = c(OFF, DEF), names_to = "Play", values_to = "Ranking") %>%
+  ggplot(aes(x = Year, y = Ranking, color = Play)) +
+  geom_point(size = 3, alpha = 0.7) + ylim(32,1) + # Add transparency and adjust point size
+  geom_smooth(method = "loess", se = FALSE, linetype = "solid") +  # Adjust smoothed line appearance
+  scale_color_brewer(palette = "Set2", labels = c("Defense", "Offense")) +  # Use a different color palette
+  labs(
+    y = "Ranking",
+    title = "Super Bowl Champion Offense vs Defense Ranking",
+    x = "Year"
+  ) +
+  theme(
+    axis.text = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5),
+    legend.title = element_blank()
+  )
+
+ggsave("NEW_offensedefense.png")
+```
+
+
+```{r}
+nfl_data %>%
+  select(Year, `DEF PASS`, `DEF RUSH`) %>%
+  pivot_longer(cols = c(`DEF PASS`, `DEF RUSH`), names_to = "Play", values_to = "Ranking") %>%
+  ggplot(aes(x = Year, y = `Ranking`, color = Play)) + geom_point() + geom_smooth() + ylim(32, 1) + guides(color = guide_legend(title = "Play")) + scale_fill_discrete(name = "Play", labels = c("Pass", "Rush")) + labs(y = "Ranking", title = "Defensive Rankings for Super Bowl Champions")
+
+ggsave("defpass_defrush.jpeg")
+```
+
+
+```{r}
+nfl_data %>%
+  select(Year, `DEF PASS`, `DEF RUSH`) %>%
+  pivot_longer(cols = c(`DEF PASS`, `DEF RUSH`), names_to = "Play", values_to = "Ranking") %>%
+  ggplot(aes(x = Year, y = `Ranking`, color = Play)) +
+  geom_point(size = 3, alpha = 0.7) +  # Add transparency and adjust point size
+  geom_smooth(method = "loess", se = FALSE, linetype = "solid") +  # Adjust smoothed line appearance
+  scale_color_brewer(palette = "Set2", labels = c("Pass Defense", "Rush Defense")) +  # Use a different color palette
+  ylim(32, 1) +  # Set appropriate y-axis limits
+  guides(color = guide_legend(title = "Play")) +
+  labs(
+    y = "Ranking",
+    title = "Defensive Rankings for Super Bowl Champions",
+    x = "Year"
+  ) +
+  theme(
+    axis.text = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5),
+        legend.title = element_blank()
+  )
+
+ggsave("NEW_defensiverankings.png")
+```
+
+
+
+```{r}
+player_data <- read_excel("NFL_Individual_QB.xlsx")
+player_data
+```
+
+
+```{r}
+player_data %>%
+  ggplot(aes(x = Season, y = `DYAR (Value)`)) + geom_point() + geom_smooth() + theme(legend.title= element_blank()) + ylim(40, 1) + labs(y = "Ranking", title = "League Ranking of Super Bowl Winning QB's")
+
+ggsave("players_ranking.jpeg")
+```
+
+```{r}
+player_data %>%
+  ggplot(aes(x = Season, y = `DYAR (Value)`)) +
+  geom_point(size = 3, alpha = 0.7, color = "blue") +  # Add transparency and adjust point size and color
+  geom_smooth(method = "loess", se = FALSE, linetype = "solid", color = "red") +  # Adjust smoothed line appearance
+  scale_color_brewer(palette = "Set3") +  # Use a different color palette
+  ylim(40, 1) +  # Set appropriate y-axis limits
+  labs(
+    y = "Ranking",
+    title = "League Ranking of Super Bowl Winning QBs",
+    x = "Season"
+  ) +
+  theme(
+    axis.text = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5)
+  )
+
+ggsave("NEW_SBqbranking.png")
+```
+
+
+```{r}
+salary_cap <- read_excel("salary_cap.xlsx")
+salary_cap %>%
+    ggplot(aes(x = Season, y = `Percent of Salary Cap`)) + geom_point() + geom_smooth() + xlim(2011, 2023) + (labs(title = "Super Bowl Winning QB % of Team Salary Cap"))
+
+ggsave("salary_cap.jpeg")
+```
+
+```{r}
+salary_cap %>%
+  ggplot(aes(x = Season, y = `Percent of Salary Cap`)) +
+  geom_point(size = 3, alpha = 0.7, color = "blue") +  # Add transparency and adjust point size and color
+  geom_smooth(method = "loess", se = FALSE, linetype = "solid", color = "red") +  # Adjust smoothed line appearance
+  scale_color_brewer(palette = "Set3") +  # Use a different color palette
+  labs(
+    y = "Percent of Salary Cap",
+    title = "Super Bowl Winning QB % of Team Salary Cap",
+    x = "Season"
+  ) +
+  theme(
+    axis.text = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5)
+  )   + scale_x_continuous(breaks = seq(2011, 2023, by = 2))  # Manually set breaks for the x-axis
+
+ggsave("NEW_salarycap.png")
+
+```
+
+
+
+```{r}
+oline <- read_excel("NFL_Individual_QB2.xlsx")
+oline %>%
+  select(Season, Quarterback, `Offensive Line`) %>%
+  filter(Season >= 1996) %>%
+  pivot_longer(cols = c(Quarterback, `Offensive Line`), names_to = "Stat", values_to = "Ranking") %>%
+  ggplot(aes(x = Season, y = Ranking, color = Stat)) + geom_point() + geom_smooth() + ylim(40, 1) + theme(legend.title= element_blank())+ labs(y = "Ranking", title = "Offensive Rankings for Super Bowl Champions")
+
+ggsave("oline_qb.jpeg")
+```
+
+```{r}
+oline %>%
+  select(Season, Quarterback, `Offensive Line`) %>%
+  filter(Season >= 1996) %>%
+  pivot_longer(cols = c(Quarterback, `Offensive Line`), names_to = "Stat", values_to = "Ranking") %>%
+  ggplot(aes(x = Season, y = Ranking, color = Stat)) +
+  geom_point(size = 3, alpha = 0.7) +  # Add transparency and adjust point size
+  geom_smooth(method = "loess", se = FALSE, linetype = "solid") +  # Adjust smoothed line appearance
+  scale_color_brewer(palette = "Dark2") +  # Use a different color palette
+  ylim(40, 1) +  # Set appropriate y-axis limits
+  labs(
+    y = "Ranking",
+    title = "QB vs Offensive Line Ranking for Super Bowl Champions",
+    x = "Season"
+  ) +
+  theme(
+    axis.text = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5),
+    legend.title = element_blank()
+  )
+
+ggsave("NEW_qbvsoline.png")
+```
+
+
+
+```{r}
+nfl_data %>%
+  filter(Year <= 2015 & Year >= 1989) %>%
+  ggplot(aes(x = Year, y = `OFF PASS`)) + geom_point()
+```
+
+```{r}
+nfl_data %>%
+  filter(Year <= 2015 & Year >= 1989) %>%
+  pivot_longer(c(`OFF PASS`, `OFF RUSH`), names_to = "Play", values_to = "Offense") %>%
+  ggplot(aes(x = Year, y = Offense, color = Play)) + geom_point() + geom_smooth(aes(color = Play))
+```
+
+
+
+
+```{r}
+nfl_data %>%
+  filter(Year <= 2015 & Year >= 1989) %>%
+  ggplot(aes(x = Year, y = OFF, size = DEF)) + geom_point()
+```
+
+
+```{r}
+nfl_data %>%
+  filter(Year <= 2015 & Year >= 1989) %>%
+  ggplot(aes(x = Year, y = `OFF PASS`, size = DEF, color = `OFF RUSH`)) + geom_point()
+```
+
+```{r}
+nfl_data %>%
+  filter(Year <= 2015 & Year >= 1989) %>%
+  ggplot(aes(x = Year, y = `OFF PASS`, size = `OFF RUSH`)) + geom_point()
+```
+
+```{r}
+nfl_data %>%
+  filter(Year <= 2015 & Year >= 1989) %>%
+  ggplot(aes(x = Year, y = `OFF PASS`, size = `DEF PASS`)) + geom_point()
+```
+
+
